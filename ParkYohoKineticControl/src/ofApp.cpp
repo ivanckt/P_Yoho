@@ -30,7 +30,7 @@ void ofApp::setup(){
     currentdisplayLog = "Park Yoho Control Software V1";
     
     guiSetup();
-    
+	musicPlayer.setup();
     
 }
 //--------------------------------------------------------------
@@ -97,7 +97,7 @@ void ofApp::update(){
     for(int i=0; i< cablePos.size(); i++){
         kinecticVisualisation.set(i, currentStyle ,ofMap(cablePos[i]->x,0,1000,0,1) ,ofMap(cablePos[i]->y,0,1000,0,1),ofMap(cablePos[i]->z,0,1000,0,1), ofMap(cablePos[i]->w,0,1000,0,1));
     }
-
+	musicPlayer.update();
 }
 
 //--------------------------------------------------------------
@@ -255,6 +255,9 @@ void ofApp::draw(){
     
     kinecticVisualisation.draw();
 
+
+	//================== Music Visualisation ==================
+	musicPlayer.draw();
 }
 
 

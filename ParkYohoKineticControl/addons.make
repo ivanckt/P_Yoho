@@ -1,5 +1,5 @@
 ofxGui
-ofxIO
 ofxInputField
+ofxIO
 ofxSerial
 ofxXmlSettings
