@@ -171,6 +171,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Keyframe.cpp" />
     <ClCompile Include="src\MusicPlayer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -224,8 +225,10 @@
     <ClCompile Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxXmlSettings\libs\tinyxml.cpp" />
     <ClCompile Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxXmlSettings\libs\tinyxmlerror.cpp" />
     <ClCompile Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxXmlSettings\libs\tinyxmlparser.cpp" />
+    <ClCompile Include="src\Timeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Keyframe.h" />
     <ClInclude Include="src\MusicPlayer.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\KineticController.h" />
@@ -294,6 +297,7 @@
     <ClInclude Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxSerial\libs\serial\include\serial\v8stdint.h" />
     <ClInclude Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxXmlSettings\src\ofxXmlSettings.h" />
     <ClInclude Include="..\..\..\Documents\of_v0.9.8_vs_release\addons\ofxXmlSettings\libs\tinyxml.h" />
+    <ClInclude Include="src\Timeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

@@ -166,6 +166,12 @@
     <ClCompile Include="src\MusicPlayer.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Timeline.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Keyframe.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -489,6 +495,12 @@
       <Filter>addons\ofxXmlSettings\libs</Filter>
     </ClInclude>
     <ClInclude Include="src\MusicPlayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Timeline.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Keyframe.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
