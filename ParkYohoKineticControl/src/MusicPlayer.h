@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "ofMain.h"
 #include "ofxGui.h"
+#include "Timeline.h"
 
 class
 	MusicPlayer {
@@ -38,6 +39,10 @@ class
 			float graphScale; //draw scale for the graph 
 
 
+			//-----------------------     Timeline      -------------------
+			Timeline timeline;
+
+
 			//-----------------------     GUI      -------------------
 			ofxButton playButton;
 			ofxButton nextButton;
@@ -50,6 +55,10 @@ class
 
 			ofxFloatSlider volume;
 			ofxFloatSlider graphSlide;
+			ofxButton addKeyButton;
+			ofxButton removeKeyButton;
+			ofxButton selectKeyButton;
+			ofParameter<float> keyframeSlider;
 
 			ofxPanel gui;
 
@@ -57,9 +66,17 @@ class
 			void playButtonPressed();
 			void nextButtonPressed();
 			void pauseButtonPressed();
-			void snapButtonPressed();
+			void addKeyButtonPressed();
+			void removeKeyButtonPressed();
+			void selectKeyButtonPressed();
 			void volumeChanged(float &setVolume);
 			void graphScrollChanged(float &setScroll);
+			void keyframeSliderChanged(float &val);
+			void keyFrameSelected(Keyframe &kf);
+			void keyFrameDeselected(int &i);
+
+			//Use this function to get the tween value of timeline
+			vector<float> getTimelineTweenValues();
 
 			void mousePressed(int x, int y, int button);
 
@@ -68,7 +85,10 @@ class
 			int lastPauseSoundTime;
 			void computeSoundDuration();
 			void resetGraph();
-
+			Keyframe *selectedKeyframe;
+			Keyframe nullKeyframe;
+			const float KEYFRAME_MIN_VALUE = 0.0f;
+			const float KEYFRAME_MAX_VALUE = 20.0f;
 
 	};
 
