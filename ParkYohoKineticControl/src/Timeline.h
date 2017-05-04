@@ -1,11 +1,15 @@
+//A class for timeline that contain keyframes and calculate their tween values based on X position
+//call getValueAtPos to get the tween value of keyframes
 #ifndef __ParkYohoTimeline__
 #define __ParkYohoTimeline__
+
 
 #include <stdio.h>
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Keyframe.h"
 #include "ofEvents.h"
+
 
 class Timeline
 {
@@ -14,23 +18,23 @@ public:
 	ofEvent<int> keyframeDeselectedEvent; //a event for other class to listen to keyframe deselected
 
 	int NULL_FRAME;
-	vector <Keyframe> frames;
+	vector <Keyframe> frames; //all the keyframes
 	ofRectangle rect;
-	Keyframe selectedKeyframe;
+	Keyframe selectedKeyframe; //the selected keyframes (select keyframe for editing its value)
 
 	float xPos;
 	float yPos;
 	float width;
-	float scroll;
+	float scroll; //scroll value of the timeline
+	int id; //id of this timeline
 	bool doAddKeyframeOnClick;
 	bool doRemoveKeyframeOnClick;	
 
-
-	void setPos(float x, float y, float w, float scroll); //set the position of timeline, scroll is the scroll amount of the graph
-	void addKeyframeOnClick(); //enable add a keyframe on next mouse Press
-	void removeKeyframeOnClick(); //enable remove a clicked keyframe on next mouse Press
-	void selectKeyframeOnClick(); //disable add or remove keyframe on click
-	float getValueAtPos(float posX); //get the value at X position
+	void setPos(float x, float y, float w, float scroll, int id); //set the position of timeline, scroll is the scroll amount of the graph
+	void addKeyframeOnClick(); //enable add keyframe mode
+	void removeKeyframeOnClick(); //enable remove keyframe mode
+	void selectKeyframeOnClick(); //disable add or remove keyframe mode
+	float getValueAtPos(float posX); //get the tween value at X position
 	void deselectKeyframes(); //deselect keyframes
 								   
 	//-----------  To do  --------------

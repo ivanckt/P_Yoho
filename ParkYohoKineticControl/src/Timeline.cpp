@@ -1,13 +1,6 @@
 #include "Timeline.h"
 
-struct keyframe_comparer
-{
-	bool operator()(const Keyframe& lhs, const Keyframe& rhs)
-	{
-		return lhs.x < rhs.x;
-	}
-};
-
+//init timeline values
 void Timeline::setup() {
 	selectedKeyframe = nullKeyframe;
 	xPos = 0.0f;
@@ -15,6 +8,8 @@ void Timeline::setup() {
 	width = 0.0f;
 	scroll = 0.0f;
 	NULL_FRAME = 0;
+	doAddKeyframeOnClick = false;
+	doRemoveKeyframeOnClick = false;
 }
 
 void Timeline::update() {
@@ -27,18 +22,29 @@ void Timeline::draw() {
 
 	//draw background
 	ofFill();
+	ofEnableAlphaBlending();
 	if (doAddKeyframeOnClick) {
-		ofSetColor(200, 225, 200);
+		ofSetColor(200, 225, 200, 200);
 	}
 	else if (doRemoveKeyframeOnClick) {
-		ofSetColor(225, 200, 200);
+		ofSetColor(225, 200, 200, 200);
 	}
 	else {
-		ofSetColor(200, 200, 200);
+		ofSetColor(200, 200, 200, 200);
 	}
 	ofDrawRectangle(xPos, yPos, width, 20);
+	ofDisableAlphaBlending();
+	ofNoFill();
+	ofSetColor(10, 10, 10);
+	ofDrawRectangle(xPos, yPos, width, 20);
 
+	//draw the id of the timeline
+	ofSetColor(50, 50, 50);
+	string str = ofToString(id);
+	ofDrawBitmapString(str, xPos, yPos + 15.0f);
+	
 	//draw keyframes 
+	ofFill();
 	ofSetColor(225, 100, 100);
 	for (int i = 0; i < frames.size(); i++) {
 		Keyframe kf = frames[i];
@@ -49,12 +55,17 @@ void Timeline::draw() {
 			ofSetColor(225, 100, 100);
 		}
 		ofDrawCircle(kf.x, yPos+10.0f, 10.0f);
+
+		ofSetColor(10, 10, 10);
+		string str = ofToString(kf.val);
+		ofDrawBitmapString(str, kf.x-10.0f, yPos + 15.0f);
 	}
 	
 	ofPopMatrix();
 	ofPopStyle();
 }
 
+//function that detect user's click in the timeline/keyframes
 void Timeline::mousePressed(int x, int y, int button) {
 	//check if the click is inside the timeline
 	if (y > yPos && y < yPos + 20 && x > xPos && x < xPos + width) {
@@ -120,6 +131,8 @@ void Timeline::mousePressed(int x, int y, int button) {
 		}
 	}
 }
+
+//deselect all keyframes
 void Timeline::deselectKeyframes() {
 	int i;
 	Keyframe kf;
@@ -127,29 +140,35 @@ void Timeline::deselectKeyframes() {
 		frames[i].selected = false;
 	}
 }
-void Timeline::setPos(float x, float y, float w, float s) {
+
+//set the position of the timeline
+void Timeline::setPos(float x, float y, float w, float s, int i) {
 	xPos = x;
 	yPos = y;
 	width = w;
 	scroll = s;
+	id = i;
 }
 
+//call this to enable Add key frame mode
 void Timeline::addKeyframeOnClick() {
 	doAddKeyframeOnClick = true;
 	doRemoveKeyframeOnClick = false;
 }
 
+//call this to enable remove key frame mode
 void Timeline::removeKeyframeOnClick() {
 	doRemoveKeyframeOnClick = true;
 	doAddKeyframeOnClick = false;
 }
 
+//call this to enable select key frame mode
 void Timeline::selectKeyframeOnClick() {
 	doRemoveKeyframeOnClick = false;
 	doAddKeyframeOnClick = false;
 }
 
-
+//get the tween value of the keyframes at Position X
 float Timeline::getValueAtPos(float posX) {
 	
 	int size = frames.size();
@@ -205,6 +224,7 @@ void Timeline::saveKeyframes() {
 
 }
 
+//clear all the key frames and reset states
 void Timeline::reset() {
 	frames.clear();
 	selectKeyframeOnClick();
@@ -214,6 +234,16 @@ void Timeline::reset() {
 	}
 }
 
+//Compare the keyframes's X position for sorting
+struct keyframe_comparer
+{
+	bool operator()(const Keyframe& lhs, const Keyframe& rhs)
+	{
+		return lhs.x < rhs.x;
+	}
+};
+
+//sort the frames using the compare function
 void Timeline::sortKeyframes() {
 	//sort the keyframes
 	std::sort(frames.begin(), frames.end(), keyframe_comparer());

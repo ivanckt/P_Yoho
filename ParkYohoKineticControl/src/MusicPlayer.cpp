@@ -44,9 +44,15 @@ void MusicPlayer::setup() {
 	graphScrollX = 0;
 	//-----------------------     Timeline      -------------------
 	selectedKeyframe = &nullKeyframe;
-	timeline.setup();
-	ofAddListener(timeline.keyframeSelectedEvent, this, &MusicPlayer::keyFrameSelected);
-	ofAddListener(timeline.keyframeDeselectedEvent, this, &MusicPlayer::keyFrameDeselected);
+	for (int i = 0; i < 20; i++) {
+		Timeline timeline;
+		timeline.setup();
+		ofAddListener(timeline.keyframeSelectedEvent, this, &MusicPlayer::keyFrameSelected);
+		ofAddListener(timeline.keyframeDeselectedEvent, this, &MusicPlayer::keyFrameDeselected);
+		timelines.push_back(timeline);
+	}
+	
+	
 	
 	//-----------------------     GUI      -------------------
 	playButton.addListener(this, &MusicPlayer::playButtonPressed);
@@ -135,7 +141,11 @@ void MusicPlayer::update() {
 
 	mp3.setLoop(repeatThisToggle);
 
-	timeline.update();
+	//-----------------------     Timeline      -------------------
+	for (int i = 0; i < 20; i++) {
+		timelines[i].update();
+	}
+	
 }
 
 //--------------------------------------------------------------
@@ -162,19 +172,16 @@ void MusicPlayer::draw() {
 	float playheadPos = 0.0f;
 	if (mp3.getIsPlaying()) {
 		playheadPos = graphWidth*mp3.getPosition();
-	}
-	else if (duration >0) {
+	}else if (duration >0) {
 		playheadPos = graphWidth*(lastPauseSoundTime*1.0f / duration);
 	}
-	//print out the useful values , timeline's value : timeline.getValueAtPos(playheadPos) or getTimelineTweenValues()[0]
-	string reportString = "fftSum: " + ofToString(fftSum) + "\nfftB1: " + ofToString(fftB1) + "\nfftB2: " + ofToString(fftB2) + "\nfftB3: " + ofToString(fftB3) + "\nfftB4: " + ofToString(fftB4) + "\ntime: " + ofToString(mp3.getPositionMS() / 1000.0f) + " / " + ofToString(duration / 1000.0f) + "\nTimeline1: " + ofToString(getTimelineTweenValues()[0]);
-	ofDrawBitmapString(reportString, 400, ofGetHeight() - 400);
-	
+
 	if (snapButtonToggle && duration >0) {
 		graphScrollX = mp3.getPosition() - (0.5f * ofGetWidth() / graphWidth);
 	}
 	ofPushMatrix();
-	ofTranslate(-graphScrollX * graphWidth, 0, 0);//translate graph to current scroll
+	ofPoint guiPos = gui.getPosition();
+	ofTranslate(-graphScrollX * graphWidth , 0, 0);//translate graph to current scroll
 
 	//draw the fft history as a line graph
 	ofSetColor(225);
@@ -196,15 +203,30 @@ void MusicPlayer::draw() {
 		}
 		ofEndShape(false);
 	}
+
+	//draw the timeline
+	for (int i = 0; i < 20; i++) {
+		timelines[i].setPos(0, 420 + i * 20, graphWidth, graphScrollX * graphWidth, i);
+		timelines[i].draw();
+	}
+
 	//draw playhead
 	ofSetColor(100, 255, 100);
-	ofDrawRectangle(playheadPos - 1, 320, 2, 100);
+	ofDrawRectangle(playheadPos - 1, 320, 2, 500);
 	
-	//draw the timeline
-	timeline.setPos(0, 420, graphWidth, graphScrollX * graphWidth);
-	timeline.draw();
-
 	ofPopMatrix();
+
+	//print out the useful values , timeline's value : timeline.getValueAtPos(playheadPos) or getTimelineTweenValues()[0]
+	ofSetColor(255, 255, 255);
+	float currentPos = 0.0f;
+	if (mp3.isPlaying()) {
+		currentPos = mp3.getPositionMS() / 1000.0f;
+	}else if(duration >0){
+		currentPos = lastPauseSoundTime / 1000.0f;
+	}
+
+	string reportString = "fftSum: " + ofToString(fftSum) + "\ntime: " + ofToString(currentPos) + " / " + ofToString(duration / 1000.0f) + "\nTimeline: " + ofToString(getTimelineTweenValues());
+	ofDrawBitmapString(reportString, 100, ofGetHeight() - 60);
 
 	ofPopStyle();
 	//-----------------------     GUI      -------------------
@@ -228,10 +250,11 @@ vector<float> MusicPlayer::getTimelineTweenValues() {
 		playheadPos = graphWidth*(lastPauseSoundTime*1.0f / duration);
 	}
 
-	float val1 = timeline.getValueAtPos(playheadPos);
-
 	vector<float> rslt;
-	rslt.push_back(val1);
+	for (int i = 0; i < 20; i++) {
+		float val = timelines[i].getValueAtPos(playheadPos);
+		rslt.push_back(val);
+	}
 
 	return rslt;
 }
@@ -243,10 +266,13 @@ void MusicPlayer::keyframeSliderChanged(float &val) {
 }
 
 void MusicPlayer::keyFrameSelected(Keyframe &kf) {
-	ofLog() << "select keyframe : " << kf.x;
+	//ofLog() << "select keyframe : " << kf.x;
 
 	//deselect all timeline's keyframes
-	timeline.deselectKeyframes();
+	for (int i = 0; i < 20; i++) {
+		timelines[i].deselectKeyframes();
+	}
+	
 	//re-select the kf
 	kf.selected = true;
 	selectedKeyframe = &kf;
@@ -259,7 +285,6 @@ void MusicPlayer::keyFrameSelected(Keyframe &kf) {
 }
 
 void MusicPlayer::keyFrameDeselected(int &i) {
-	ofLog() << "deselect keyframe ";
 	selectedKeyframe = &nullKeyframe;
 
 	keyframeSlider.setMax(0);
@@ -268,15 +293,21 @@ void MusicPlayer::keyFrameDeselected(int &i) {
 }
 
 void MusicPlayer::addKeyButtonPressed() {
-	timeline.addKeyframeOnClick();
+	for (int i = 0; i < 20; i++) {
+		timelines[i].addKeyframeOnClick();
+	}
 }
 
 void MusicPlayer::removeKeyButtonPressed() {
-	timeline.removeKeyframeOnClick();
+	for (int i = 0; i < 20; i++) {
+		timelines[i].removeKeyframeOnClick();
+	}
 }
 
 void MusicPlayer::selectKeyButtonPressed() {
-	timeline.selectKeyframeOnClick();
+	for (int i = 0; i < 20; i++) {
+		timelines[i].selectKeyframeOnClick();
+	}
 }
 
 //--------------------------------------------------------------
@@ -335,8 +366,9 @@ void MusicPlayer::mousePressed(int x, int y, int button) {
 			lastPauseSoundTime = time;
 		}
 	}
-
-	timeline.mousePressed(x, y, button);
+	for (int i = 0; i < 20; i++) {
+		timelines[i].mousePressed(x, y, button);
+	}
 }
 
 //--------------------------------------------------------------
@@ -363,4 +395,10 @@ void MusicPlayer::resetGraph() {
 	timeHistory.clear();
 	lastMaxSoundTime = 0;
 	lastPauseSoundTime = 0;
+
+	//reset timeline
+	for (int i = 0; i < 20; i++) {
+		timelines[i].reset();
+	}
+	selectedKeyframe = &nullKeyframe;
 }
