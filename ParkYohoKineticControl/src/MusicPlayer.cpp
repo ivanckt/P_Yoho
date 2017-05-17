@@ -64,6 +64,8 @@ void MusicPlayer::setup() {
 	volume.addListener(this, &MusicPlayer::volumeChanged);
 	graphSlide.addListener(this, &MusicPlayer::graphScrollChanged);
 	keyframeSlider.addListener(this, &MusicPlayer::keyframeSliderChanged);
+	saveButton.addListener(this, &MusicPlayer::saveButtonPressed);
+	loadButton.addListener(this, &MusicPlayer::loadButtonPressed);
 
 	gui.setup("panel");
 	gui.setDefaultWidth(400);
@@ -75,11 +77,13 @@ void MusicPlayer::setup() {
 	gui.add(volume.setup("Volume", 0.8, 0, 1));
 	gui.add(graphSlide.setup("Graph Slide", 0, 0, 1));
 	gui.add(trackFileName.setup("Now Playing", ""));
+	gui.add(saveButton.setup("Save Timeline for this track"));
+	gui.add(loadButton.setup("Load Timeline for this track"));
 	gui.add(addKeyButton.setup("Add Keyframe Mode"));
 	gui.add(removeKeyButton.setup("Remove Keyframe Mode"));
 	gui.add(selectKeyButton.setup("Select Keyframe Mode"));
 	gui.add(keyframeSlider.set("Keyframe Value", 0, 0, 0));//the slider is disabled at start, enabled when a keyframe is selected
-
+	
 
 	gui.loadFromFile("musicPlayerSettings.xml");
 }
@@ -318,6 +322,7 @@ void MusicPlayer::selectKeyButtonPressed() {
 void MusicPlayer::playButtonPressed() {
 	computeSoundDuration();
 	resetGraph();
+	reloadTimelineFromSave();
 	mp3.play();
 	trackFileName.setup("Now Playing", dir.getName(currentTrack));
 }
@@ -335,6 +340,7 @@ void MusicPlayer::nextButtonPressed() {
 	mp3.load(dir.getPath(currentTrack));
 	computeSoundDuration();
 	resetGraph();
+	reloadTimelineFromSave();
 	mp3.play();
 	trackFileName.setup("Now Playing", dir.getName(currentTrack));
 
@@ -368,6 +374,64 @@ void MusicPlayer::mousePressed(int x, int y, int button) {
 	}
 	for (int i = 0; i < 20; i++) {
 		timelines[i].mousePressed(x, y, button);
+	}
+}
+
+void MusicPlayer::saveButtonPressed() {
+	ofxXmlSettings track;
+	track.addTag("track");
+	track.pushTag("track");
+	//volHistory is we want to save to a file
+	for (int i = 0; i < timelines.size(); i++) {
+		track.addTag("timeline");
+		track.pushTag("timeline", i);
+		Timeline timeline = timelines[i];
+		for (int j = 0; j < timeline.frames.size(); j++) {
+			//each position tag represents one point
+			track.addTag("snd");
+			track.pushTag("snd", j);
+			//so set the three values in the file
+			track.addValue("val", timeline.frames[j].val);
+			track.addValue("x", timeline.frames[j].x);
+			track.popTag();
+		}
+		track.popTag();
+	}
+	track.popTag(); //pop position
+	track.saveFile("track_"+ ofToString(currentTrack) + ofToString(".xml"));
+}
+
+void MusicPlayer::loadButtonPressed() {
+	reloadTimelineFromSave();
+}
+
+void MusicPlayer::reloadTimelineFromSave() {
+	//reset the timeline previous values
+	for (int i = 0; i < 20; i++) {
+		timelines[i].reset();
+	}
+
+	//This is how you would load that very same file    
+	ofxXmlSettings track;
+	if (track.loadFile("track_" + ofToString(currentTrack) + ofToString(".xml"))) {
+		track.pushTag("track");
+		int numTimeline = track.getNumTags("timeline");
+		for (int i = 0; i < numTimeline; i++) {
+			track.pushTag("timeline", i);
+
+			int numSnd = track.getNumTags("snd");
+			for (int j = 0; j < numSnd; j++) {
+				track.pushTag("snd", j);
+				timelines[i].addKeyframeByVal(track.getValue("val", 0.0f), track.getValue("x", 0.0f));
+				track.popTag();
+			}
+			track.popTag();
+		}
+
+		track.popTag(); //pop position
+	}
+	else {
+		ofLogError("Track Save file did not load!");
 	}
 }
 

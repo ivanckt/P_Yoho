@@ -132,6 +132,21 @@ void Timeline::mousePressed(int x, int y, int button) {
 	}
 }
 
+void Timeline::addKeyframeByVal(float val, float x) {
+	//deselect the keyframe if there is a selected
+	if (nullKeyframe.x != selectedKeyframe.x) {
+		selectedKeyframe = nullKeyframe;
+		keyframeDeselectedEvent.notify(this, NULL_FRAME);
+	}
+	//if not clicking on any keyframe, add a new keyframe
+	Keyframe newKf;
+	newKf.x = x;
+	newKf.val = val;
+	//newKf.selected = true;
+	frames.push_back(newKf);
+	sortKeyframes();
+}
+
 //deselect all keyframes
 void Timeline::deselectKeyframes() {
 	int i;

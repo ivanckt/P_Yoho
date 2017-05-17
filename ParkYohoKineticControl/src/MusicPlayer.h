@@ -5,6 +5,7 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "Timeline.h"
+#include "ofxXmlSettings.h"
 
 
 // A class that wrap the music player, fft graph, timeline
@@ -51,6 +52,8 @@ class
 			ofxButton playButton;
 			ofxButton nextButton;
 			ofxButton pauseButton;
+			ofxButton saveButton;
+			ofxButton loadButton;
 
 			ofxLabel trackFileName;
 			//ofxToggle repeatAllToggle; //TODO
@@ -70,6 +73,8 @@ class
 			void playButtonPressed();
 			void nextButtonPressed();
 			void pauseButtonPressed();
+			void saveButtonPressed();
+			void loadButtonPressed();
 			void addKeyButtonPressed();
 			void removeKeyButtonPressed();
 			void selectKeyButtonPressed();
@@ -93,6 +98,8 @@ class
 			Keyframe nullKeyframe; //a keyframe that is null, i.e. no selected key frame
 			const float KEYFRAME_MIN_VALUE = 0.0f; //THe minimum value for a keyframe in slider
 			const float KEYFRAME_MAX_VALUE = 20.0f; //the maximum value for a keyframe in slider
+
+			void reloadTimelineFromSave();//load the timeline save file
 
 	};
 

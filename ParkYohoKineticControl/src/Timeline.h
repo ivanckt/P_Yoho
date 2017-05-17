@@ -32,6 +32,7 @@ public:
 
 	void setPos(float x, float y, float w, float scroll, int id); //set the position of timeline, scroll is the scroll amount of the graph
 	void addKeyframeOnClick(); //enable add keyframe mode
+	void addKeyframeByVal(float val, float x); //enable add keyframe mode
 	void removeKeyframeOnClick(); //enable remove keyframe mode
 	void selectKeyframeOnClick(); //disable add or remove keyframe mode
 	float getValueAtPos(float posX); //get the tween value at X position
